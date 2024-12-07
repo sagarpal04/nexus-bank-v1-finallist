@@ -70,6 +70,7 @@ export const signupTemplate = `<!DOCTYPE html>
       <h2>Your Account is Successfully Created 🎉</h2>
       <p>Dear {%CUSTOMER_NAME%},</p>
       <p>Welcome to Nexus Bank! We’re thrilled to have you on board. Your account has been created successfully, giving you access to a simple and secure way to manage your finances.</p>
+      <p>We have credited your account with an initial amount of <strong>{%AMOUNT%}</strong>.</p>
       <p>Through your account, you can:</p>
       <ul>
         <li>Transfer funds easily</li>
@@ -85,8 +86,6 @@ export const signupTemplate = `<!DOCTYPE html>
 </body>
 </html>
 `;
-
-
 
 export const loginTemplate = `<!DOCTYPE html>
 <html lang="en">
@@ -168,7 +167,7 @@ export const loginTemplate = `<!DOCTYPE html>
 </html>
 `;
 
-export const  moneyAddedTemplate = `<!DOCTYPE html>
+export const moneyAddedTemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -228,7 +227,6 @@ export const  moneyAddedTemplate = `<!DOCTYPE html>
     </div>
     <div class="content">
       <h2>Account Update Notification</h2>
-      <p>Dear {%CUSTOMER_NAME%},</p>
       <p>We are pleased to inform you that an amount of <strong>₹{%AMOUNT%}</strong> has been successfully added to your Nexus Bank account.</p>
       <p>If you have any questions regarding this transaction, please do not hesitate to contact our support team.</p>
       <p>Your security is our top priority. To help protect your account, please keep these tips in mind:</p>
@@ -321,7 +319,7 @@ export const transferTemplate = `<!DOCTYPE html>
 </html>
 `;
 
-export const closureTemplate =`<!DOCTYPE html>
+export const closureTemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">

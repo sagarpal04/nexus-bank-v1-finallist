@@ -29,17 +29,24 @@ function isValidPassword(password) {
 }
 export function signup(req, res) {
   let signupTemplate = originalSignupTemplate;
-  signupTemplate = signupTemplate.replace(`{%CUSTOMER_NAME%}`, req.body.name);
+  signupTemplate = signupTemplate
+    .replace(`{%CUSTOMER_NAME%}`, req.body.name)
+    .replace(`{%AMOUNT%}`, req.body.balance);
+
   console.log(signupTemplate);
+
   const { name, email, password, balance } = req.body;
+
   const formattedName = name
     .toLowerCase()
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+
   if (!isValidPassword(password)) {
     return res.status(400).json({ message: "Password is not strong" });
   }
+
   bcrypt.hash(password, 10, (err, hashedPassword) => {
     if (err) {
       return res.status(500).json({ message: "Error hashing password" });
@@ -52,19 +59,40 @@ export function signup(req, res) {
         if (err) {
           return res.status(400).json({ message: "User already exists" });
         }
-        const mailOptions = {
-          from: '"Nexus Bank" <nexus.bank.org@gmail.com>',
-          to: email,
-          subject: "Account Create Successfully",
-          html: signupTemplate,
-        };
-        transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
-            console.log(error);
+
+        db.query(
+          "INSERT INTO transactions (email, type, date, amount) VALUES (?, ?, ?, ?)",
+          [email, "DEPOSIT", new Date(), Number(balance)],
+          (transactionErr) => {
+            if (transactionErr) {
+              console.error(transactionErr);
+              return res
+                .status(500)
+                .json({ error: "Error creating transaction entry" });
+            }
+
+            console.log("Transaction entry created");
+
+            const mailOptions = {
+              from: '"Nexus Bank" <nexus.bank.org@gmail.com>',
+              to: email,
+              subject: "Account Created Successfully",
+              html: signupTemplate,
+            };
+
+            transporter.sendMail(mailOptions, (emailErr, info) => {
+              if (emailErr) {
+                console.error("Error sending email:", emailErr);
+              } else {
+                console.log("Email sent:", info.response);
+              }
+            });
+
+            return res
+              .status(201)
+              .json({ message: "User created successfully" });
           }
-          console.log("Email sent: " + info.response);
-        });
-        return res.status(201).json({ message: "User created" });
+        );
       }
     );
   });
@@ -247,6 +275,7 @@ export function updateBalance(req, res) {
 
 export function transferTo(req, res) {
   const { email, amount, user, name } = req.body;
+  console.log(email, user, amount, name);
   let transferTemplate = originalTransferTemplate;
   transferTemplate = transferTemplate
     .replace("{%CUSTOMER_NAME%}", name)
@@ -261,6 +290,11 @@ export function transferTo(req, res) {
     if (err) {
       console.error(err);
       return res.status(500).json({ error: "Error checking user" });
+    }
+    if (email === user) {
+      return res
+        .status(400)
+        .json({ message: "You cannot transfer to yourself" });
     }
     if (results.length === 0) {
       return res.status(404).json({ message: "User not found" });

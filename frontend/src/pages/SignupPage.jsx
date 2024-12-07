@@ -26,11 +26,6 @@ export default function SignupPage() {
       );
 
       if (response.status === 201) {
-        await axios.post(`${import.meta.env.VITE_BASE_URL}/api/addmoney`, {
-          email: formData.email,
-          amount: formData.balance,
-          type: "DEPOSIT",
-        });
         setIsAuthenticated(formData.email);
       }
     } catch (error) {
@@ -133,7 +128,7 @@ export default function SignupPage() {
                   htmlFor="balance"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Initial Deposit
+                  Initial Deposit (Max : 1CR)
                 </label>
                 <input
                   type="number"
